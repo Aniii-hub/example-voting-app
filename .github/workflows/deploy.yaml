@@ -2,15 +2,38 @@ name: Deploy to Kubernetes
 
 on:
   workflow_run:
-    workflows: ["Build Vote"]
+    workflows:
+      - Build Vote
+      - Build Result
+      - Build Worker
     types:
       - completed
 
 jobs:
   deploy:
+    name: Deploy Application
     runs-on: ubuntu-latest
 
     steps:
-    - name: Restart Kubernetes Deployment
-      run: |
-        kubectl rollout restart deployment vote
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup kubeconfig
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" > $HOME/.kube/config
+
+      - name: Verify Kubernetes connection
+        run: kubectl get nodes
+
+      - name: Apply Kubernetes manifests
+        run: kubectl apply -f k8s-specifications/
+
+      - name: Restart deployments
+        run: |
+          kubectl rollout restart deployment vote
+          kubectl rollout restart deployment result
+          kubectl rollout restart deployment worker
+
+      - name: Show Pods Status
+        run: kubectl get pods -o wide
