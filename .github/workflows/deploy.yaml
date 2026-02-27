@@ -1,0 +1,16 @@
+name: Deploy to Kubernetes
+
+on:
+  workflow_run:
+    workflows: ["Build Vote"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Restart Kubernetes Deployment
+      run: |
+        kubectl rollout restart deployment vote

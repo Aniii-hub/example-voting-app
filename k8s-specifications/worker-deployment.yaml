@@ -17,3 +17,4 @@ spec:
       containers:
       - image: anirudh967/worker:latest
         name: worker
+        imagePullPolicy: Always

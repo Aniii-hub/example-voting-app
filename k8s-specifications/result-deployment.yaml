@@ -17,6 +17,7 @@ spec:
       containers:
       - image: anirudh967/result:latest
         name: result
+        imagePullPolicy: Always
         ports:
         - containerPort: 80
           name: result
